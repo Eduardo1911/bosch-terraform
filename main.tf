@@ -1,6 +1,6 @@
 resource "random_password" "vm_password" {
   count  = var.vm_count
-  length = 16
+  length = var.password_length
 }
 
 provider "aws" {
@@ -40,7 +40,7 @@ resource "aws_instance" "vm" {
     inline = [
       "sudo apt-get update",
       "sudo apt-get install -y iputils-ping",
-      "sudo usermod --password $(openssl passwd -1 ${element(var.VM_PASSWORD, count.index)}) ec2-user",
+      "sudo usermod --password $(openssl passwd -1 ${element(random_password.vm_password, count.index)}) ec2-user",
     ]
   }
 }

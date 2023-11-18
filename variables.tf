@@ -21,7 +21,8 @@ variable "VM_PUBLIC_IPS" {
   default = []
 }
 
-variable "VM_PASSWORD" {
-  type    = list(string)
-  default = []
+variable "password_length" {
+  description = "The length of the randomly generated passwords"
+  type        = number
+  default     = 16
 }
