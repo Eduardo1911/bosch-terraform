@@ -27,7 +27,7 @@ resource "aws_instance" "vm" {
   tags = {
     Name = "VM-${count.index}"
   }
-
+  vpc_security_group_ids = [aws_security_group.vm_sg.id]
   connection {
     type        = "ssh"
     user        = "ec2-user"
