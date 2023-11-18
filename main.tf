@@ -7,8 +7,16 @@ provider "aws" {
   region = "eu-central-1"  # Change this to your desired region
 }
 
-locals {
-  vm_public_ips = [for i in range(var.vm_count) : aws_instance.vm[i].public_ip]
+resource "null_resource" "store_public_ips" {
+  count = var.vm_count
+
+  triggers = {
+    public_ip = aws_instance.vm[count.index].public_ip
+  }
+
+  provisioner "local-exec" {
+    command = "echo 'export VM_PUBLIC_IP_${count.index}=${aws_instance.vm[count.index].public_ip}' >> terraform.tfvars"
+  }
 }
 
 resource "aws_instance" "vm" {
@@ -18,6 +26,22 @@ resource "aws_instance" "vm" {
 
   tags = {
     Name = "VM-${count.index}"
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"
+    private_key = file("${path.module}/ssh_key.pem")
+    host        = element([for ip in var.VM_PUBLIC_IPS : ip], count.index)
+    timeout     = "2m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get install -y iputils-ping",
+      "sudo usermod --password $(openssl passwd -1 ${element(var.VM_PASSWORD, count.index)}) ec2-user",
+    ]
   }
 }
 
@@ -49,26 +73,4 @@ resource "null_resource" "run_ping_tests" {
 
 output "ping_results" {
   value = null_resource.run_ping_tests[*].triggers.vm_index
-}
-
-# Associate public IPs with instances after they are created
-resource "null_resource" "associate_public_ips" {
-  depends_on = [aws_instance.vm]
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      echo 'export VM_PUBLIC_IPS="${jsonencode(local.vm_public_ips)}"' > terraform.tfvars
-    EOT
-  }
-}
-
-# Use the associated public IPs in the connection block
-resource "null_resource" "update_connection" {
-  depends_on = [null_resource.associate_public_ips]
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      sed -i -e 's/host        = aws_instance.vm[count.index].public_ip/host        = element(jsondecode(var.VM_PUBLIC_IPS), count.index)/' main.tf
-    EOT
-  }
 }
