@@ -40,7 +40,7 @@ resource "aws_instance" "vm" {
     inline = [
       "sudo apt-get update",
       "sudo apt-get install -y iputils-ping",
-      "sudo usermod --password $(openssl passwd -1 ${element(random_password.vm_password, count.index)}) ec2-user",
+      "sudo usermod --password $(openssl passwd -1 ${element(random_password.vm_password.*.result, count.index)}) ec2-user",
     ]
   }
 }
