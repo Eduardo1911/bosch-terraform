@@ -13,5 +13,5 @@ variable "vm_flavor" {
 variable "vm_image" {
   description = "VM image"
   type        = string
-  default     = "ami-0c55b159cbfafe1f0"  # Change this to your desired AMI
+  default     = "ami-0bf34e885a84149e6"  # Change this to your desired AMI
 }
