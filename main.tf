@@ -31,7 +31,7 @@ resource "aws_instance" "vm" {
   vpc_security_group_ids = [aws_security_group.vm_sg.id]
   connection {
     type        = "ssh"
-    user        = "ec2-user"
+    user        = "ubuntu"
     private_key = file("${path.module}/ssh_key.pem")
     host        = self.public_ip
     timeout     = "2m"
@@ -41,7 +41,7 @@ resource "aws_instance" "vm" {
     inline = [
       "sudo apt-get update",
       "sudo apt-get install -y iputils-ping",
-      "sudo usermod --password $(openssl passwd -1 ${element(random_password.vm_password.*.result, count.index)}) ec2-user",
+      "sudo usermod --password $(openssl passwd -1 ${element(random_password.vm_password.*.result, count.index)}) ubuntu",
     ]
   }
 }
