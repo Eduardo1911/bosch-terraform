@@ -20,7 +20,7 @@ resource "aws_instance" "vm" {
     type        = "ssh"
     user        = "ec2-user"  # Adjust this based on the OS of your AMI
     private_key = file("${path.module}/ssh_key.pem")  # Update path accordingly
-    host        = aws_instance.vm[count.index].public_ip  # Specify the public IP address of the instance
+    host        = aws_instance.vm[count.index].self.public_ip  # Specify the public IP address of the instance
     timeout     = "2m"  # Adjust timeout as needed
   }
 
