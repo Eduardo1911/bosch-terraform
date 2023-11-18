@@ -15,3 +15,13 @@ variable "vm_image" {
   type        = string
   default     = "ami-0bf34e885a84149e6"  # Change this to your desired AMI
 }
+
+variable "VM_PUBLIC_IPS" {
+  type    = list(string)
+  default = []
+}
+
+variable "VM_PASSWORD" {
+  type    = list(string)
+  default = []
+}
