@@ -23,6 +23,7 @@ resource "aws_instance" "vm" {
   count         = var.vm_count
   ami           = var.vm_image
   instance_type = var.vm_flavor
+  key_name = "gh-runner-key"
 
   tags = {
     Name = "VM-${count.index}"
