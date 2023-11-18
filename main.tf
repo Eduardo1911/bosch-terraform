@@ -1,4 +1,8 @@
 # main.tf
+resource "random_password" "vm_password" {
+  count  = var.vm_count
+  length = 16
+}
 provider "aws" {
   region = "eu-central-1"  # Change this to your desired region
 }
@@ -12,10 +16,23 @@ resource "aws_instance" "vm" {
     Name = "VM-${count.index}"
   }
 
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"  # Adjust this based on the OS of your AMI
+    private_key = file("${path.module}/ssh_key.pem")  # Update path accordingly
+    host        = aws_instance.vm[count.index].public_ip  # Specify the public IP address of the instance
+    timeout     = "2m"  # Adjust timeout as needed
+  }
+
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get update",
       "sudo apt-get install -y iputils-ping",
+    ]
+  }
+    provisioner "remote-exec" {
+    inline = [
+      "sudo usermod --password $(openssl passwd -1 ${random_password.vm_password[count.index].result}) ec2-user",
     ]
   }
 }
