@@ -55,7 +55,14 @@ resource "aws_security_group" "vm_sg" {
     protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+    ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
+
 
 resource "null_resource" "run_ping_tests" {
   count = var.vm_count
