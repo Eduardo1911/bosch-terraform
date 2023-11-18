@@ -18,11 +18,6 @@ jobs:
       with:
         terraform_version: 1.0.0
 
-    - name: Upload SSH key
-      uses: webfactory/ssh-agent@v0.4.2
-      with:
-        ssh-private-key: ${{ secrets.GH_RUNNER_SSH_PRIVATE_KEY }}
-
     - name: Copy SSH Key
       run: echo "${{ secrets.GH_RUNNER_SSH_PRIVATE_KEY }}" > ssh_key.pem
 
