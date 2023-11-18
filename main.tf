@@ -7,17 +7,17 @@ provider "aws" {
   region = "eu-central-1"  # Change this to your desired region
 }
 
-resource "null_resource" "store_public_ips" {
-  count = var.vm_count
+# resource "null_resource" "store_public_ips" {
+#   count = var.vm_count
 
-  triggers = {
-    public_ip = aws_instance.vm[count.index].public_ip
-  }
+#   triggers = {
+#     public_ip = aws_instance.vm[count.index].public_ip
+#   }
 
-  provisioner "local-exec" {
-    command = "echo 'export VM_PUBLIC_IP_${count.index}=${aws_instance.vm[count.index].public_ip}' >> terraform.tfvars"
-  }
-}
+#   provisioner "local-exec" {
+#     command = "echo 'export VM_PUBLIC_IP_${count.index}=${aws_instance.vm[count.index].public_ip}' >> terraform.tfvars"
+#   }
+# }
 
 resource "aws_instance" "vm" {
   count         = var.vm_count
@@ -32,7 +32,7 @@ resource "aws_instance" "vm" {
     type        = "ssh"
     user        = "ec2-user"
     private_key = file("${path.module}/ssh_key.pem")
-    host        = element([for ip in var.VM_PUBLIC_IPS : ip], count.index)
+    host        = self.public_ip
     timeout     = "2m"
   }
 
