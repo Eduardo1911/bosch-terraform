@@ -42,8 +42,10 @@ resource "null_resource" "run_ping_tests" {
   provisioner "local-exec" {
     command = "bash ping_test.sh ${var.vm_count} ${aws_instance.vm[*].id}"
   }
+
+  depends_on = [aws_instance.vm]  # Ensure the instances are created before running the script
 }
 
 output "ping_results" {
-  value = [for idx in range(var.vm_count) : null_resource.run_ping_tests[idx].stdout]
+  value = null_resource.run_ping_tests[*].triggers.vm_index
 }
