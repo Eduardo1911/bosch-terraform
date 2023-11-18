@@ -1,6 +1,6 @@
 # main.tf
 provider "aws" {
-  region = "us-east-1"  # Change this to your desired region
+  region = "us-central-1"  # Change this to your desired region
 }
 
 resource "aws_instance" "vm" {
@@ -40,19 +40,7 @@ resource "null_resource" "run_ping_tests" {
   }
 
   provisioner "local-exec" {
-    command = <<EOT
-      VM_COUNT=${var.vm_count}
-      VM_IDS=(${aws_instance.vm[*].id})
-      SOURCE=${VM_IDS[${count.index}]}
-      for DESTINATION in "${VM_IDS[@]}"; do
-        ping -c 1 -W 1 $(aws_instance.${DESTINATION}.public_ip) > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
-          echo "Ping from ${SOURCE} to ${DESTINATION}: PASS"
-        else
-          echo "Ping from ${SOURCE} to ${DESTINATION}: FAIL"
-        fi
-      done
-    EOT
+    command = "bash ping_test.sh ${var.vm_count} ${aws_instance.vm[*].id}"
   }
 }
 
