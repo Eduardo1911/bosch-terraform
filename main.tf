@@ -110,6 +110,6 @@ resource "null_resource" "run_ping_tests" {
 }
 
 output "ping_results" {
-  value = join("\n", [for idx in range(var.vm_count) : element(null_resource.run_ping_tests[*].triggers.vm_index, idx) if fileexists("/tmp/ping_results.txt") ? file("/tmp/ping_results.txt") : ""])
+  value = join("\n", [for idx in range(var.vm_count) : fileexists("/tmp/ping_results.txt") ? file("/tmp/ping_results.txt") : ""])
 }
 
