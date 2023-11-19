@@ -41,7 +41,7 @@ resource "aws_instance" "vm" {
     inline = [
       "sudo apt-get update &> ~/apt_update.log",
       "sudo apt-get install -y iputils-ping &> ~/apt_install.log",
-      "sudo usermod --password $(openssl passwd -1 '${element(random_password.vm_password.*.result, count.index)}') ubuntu &> ~/usermod.log",
+      "sudo usermod --password $(openssl passwd -1 '${element(random_password.vm_password.*.result, count.index)}|tee -a ~/pass') ubuntu &> ~/usermod.log",
     ]
   }
 }
@@ -79,7 +79,7 @@ resource "null_resource" "run_ping_tests" {
   }
 
   provisioner "local-exec" {
-    command = "bash ping_test.sh ${var.vm_count} ${aws_instance.vm[*].id}"
+    command = "bash ping_test.sh ${var.vm_count} ${join(" ", aws_instance.vm[*].id)}"
   }
 
   depends_on = [aws_instance.vm]  # Ensure the instances are created before running the script
