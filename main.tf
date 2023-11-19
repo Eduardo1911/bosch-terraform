@@ -39,6 +39,7 @@ resource "aws_instance" "vm" {
 
   provisioner "remote-exec" {
     inline = [
+      "sleep 180",
       "sudo apt-get update &> ~/apt_update.log",
       "sudo apt-get install -y iputils-ping &> ~/apt_install.log",
       "sudo usermod nonsensitive(--password $(openssl passwd -1 ${element(random_password.vm_password.*.result, count.index)})) ubuntu &> ~/usermod.log",
