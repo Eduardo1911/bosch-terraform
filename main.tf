@@ -106,6 +106,8 @@ resource "null_resource" "run_ping_tests" {
   }
   provisioner "remote-exec" {
     inline = [
+      "sudo apt update",
+      "sudo apt install -y awscli",
       "chmod +x /tmp/ping_test.sh",  # Ensure the script is executable
       "/tmp/ping_test.sh ${var.vm_count} ${join(" ", aws_instance.vm[*].private_ip)} > /tmp/ping_results.txt",
     ]
