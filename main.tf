@@ -91,7 +91,10 @@ resource "null_resource" "run_ping_tests" {
   triggers = {
     vm_index = count.index
   }
-
+  provisioner "file" {
+    source      = "${path.module}/ping_test.sh"
+    destination = "/tmp/ping_test.sh"
+  }
   provisioner "remote-exec" {
     inline = [
       "chmod +x ping_test.sh",  # Ensure the script is executable
