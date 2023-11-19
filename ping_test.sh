@@ -1,14 +1,18 @@
 #!/bin/bash
 
+# Arguments
 VM_COUNT=$1
-VM_IDS=("${@:2}")
-SOURCE=${VM_IDS[0]}
+VM_IPS="${@:2}"
 
-for DESTINATION in "${VM_IDS[@]}"; do
-  ping -c 1 -W 1 $(aws ec2 describe-instances --region eu-central-1 --instance-ids $DESTINATION --query "Reservations[0].Instances[0].PublicIpAddress" --output text) > /dev/null 2>&1
-  if [ $? -eq 0 ]; then
-    echo "Ping from $SOURCE to $DESTINATION: PASS"
-  else
-    echo "Ping from $SOURCE to $DESTINATION: FAIL"
-  fi
+# Ping Test
+for ((i=0; i<$VM_COUNT; i++)); do
+  SOURCE_IP=$(echo $VM_IPS | cut -d ' ' -f $((i+1)))
+  DESTINATION_INDEX=$(( (i+1) % VM_COUNT ))
+  DESTINATION_IP=$(echo $VM_IPS | cut -d ' ' -f $((DESTINATION_INDEX + 1)))
+
+  # Run ping and capture result
+  ping_result=$(ping -c 1 $DESTINATION_IP > /dev/null 2>&1 && echo "pass" || echo "fail")
+
+  # Output the ping result
+  echo "Ping from $SOURCE_IP to $DESTINATION_IP: $ping_result"
 done
