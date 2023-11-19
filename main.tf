@@ -85,6 +85,31 @@ resource "null_resource" "run_ping_tests" {
   depends_on = [aws_instance.vm]  # Ensure the instances are created before running the script
 }
 
-output "ping_results" {
-  value = null_resource.run_ping_tests[*].triggers.vm_index
+resource "null_resource" "run_ping_tests" {
+  count = var.vm_count
+
+  triggers = {
+    vm_index = count.index
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x ping_test.sh",  # Ensure the script is executable
+      "./ping_test.sh ${var.vm_count} ${join(" ", aws_instance.vm[*].private_ip)} > /tmp/ping_results.txt",
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("${path.module}/ssh_key.pem")
+      host        = element(aws_instance.vm[*].public_ip, count.index)
+    }
+  }
+
+  depends_on = [aws_instance.vm]  # Ensure the instances are created before running the script
 }
+
+output "ping_results" {
+  value = join("\n", [for idx in range(var.vm_count) : element(null_resource.run_ping_tests[*].triggers.vm_index, idx) if fileexists("/tmp/ping_results.txt") ? file("/tmp/ping_results.txt") : ""])
+}
+
