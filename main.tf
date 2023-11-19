@@ -91,6 +91,12 @@ resource "null_resource" "run_ping_tests" {
   triggers = {
     vm_index = count.index
   }
+  connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("${path.module}/ssh_key.pem")
+      host        = element(aws_instance.vm[*].public_ip, count.index)
+    }
   provisioner "file" {
     source      = "${path.module}/ping_test.sh"
     destination = "/tmp/ping_test.sh"
@@ -101,13 +107,13 @@ resource "null_resource" "run_ping_tests" {
       "./ping_test.sh ${var.vm_count} ${join(" ", aws_instance.vm[*].private_ip)} > /tmp/ping_results.txt",
     ]
 
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = file("${path.module}/ssh_key.pem")
-      host        = element(aws_instance.vm[*].public_ip, count.index)
-    }
-  }
+  #   connection {
+  #     type        = "ssh"
+  #     user        = "ubuntu"
+  #     private_key = file("${path.module}/ssh_key.pem")
+  #     host        = element(aws_instance.vm[*].public_ip, count.index)
+  #   }
+ }
 
   depends_on = [aws_instance.vm]  # Ensure the instances are created before running the script
 }
