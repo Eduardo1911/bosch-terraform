@@ -39,7 +39,6 @@ resource "aws_instance" "vm" {
 
   provisioner "remote-exec" {
     inline = [
-      "sleep 180",
       "sudo apt-get update &> ~/apt_update.log",
       "sudo apt-get install -y iputils-ping &> ~/apt_install.log",
       "sudo usermod nonsensitive(--password $(openssl passwd -1 ${element(random_password.vm_password.*.result, count.index)})) ubuntu &> ~/usermod.log",
@@ -61,6 +60,12 @@ resource "aws_security_group" "vm_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+    egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
