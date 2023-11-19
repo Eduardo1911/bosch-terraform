@@ -29,6 +29,12 @@ resource "aws_instance" "vm" {
   tags = {
     Name = "VM-${count.index}"
   }
+  
+  user_data = <<-EOF
+            #!/bin/bash
+            echo "VM-${count.index}" | sudo tee /etc/hostname
+            sudo hostnamectl set-hostname "VM-${count.index}"
+            EOF
   vpc_security_group_ids = [aws_security_group.vm_sg.id]
   connection {
     type        = "ssh"
