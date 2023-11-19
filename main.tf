@@ -71,19 +71,19 @@ resource "aws_security_group" "vm_sg" {
 }
 
 
-resource "null_resource" "run_ping_tests" {
-  count = var.vm_count
+# resource "null_resource" "run_ping_tests" {
+#   count = var.vm_count
 
-  triggers = {
-    vm_index = count.index
-  }
+#   triggers = {
+#     vm_index = count.index
+#   }
 
-  provisioner "local-exec" {
-    command = "bash ping_test.sh ${var.vm_count} ${join(" ", aws_instance.vm[*].id)}"
-  }
+#   provisioner "local-exec" {
+#     command = "bash ping_test.sh ${var.vm_count} ${join(" ", aws_instance.vm[*].id)}"
+#   }
 
-  depends_on = [aws_instance.vm]  # Ensure the instances are created before running the script
-}
+#   depends_on = [aws_instance.vm]  # Ensure the instances are created before running the script
+# }
 
 resource "null_resource" "run_ping_tests" {
   count = var.vm_count
