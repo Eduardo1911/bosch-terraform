@@ -105,8 +105,8 @@ resource "null_resource" "run_ping_tests" {
   }
   provisioner "remote-exec" {
     inline = [
-      "chmod +x ping_test.sh",  # Ensure the script is executable
-      "./ping_test.sh ${var.vm_count} ${join(" ", aws_instance.vm[*].private_ip)} > /tmp/ping_results.txt",
+      "chmod +x /tmp/ping_test.sh",  # Ensure the script is executable
+      "/tmp/ping_test.sh ${var.vm_count} ${join(" ", aws_instance.vm[*].private_ip)} > /tmp/ping_results.txt",
     ]
 
     connection {
