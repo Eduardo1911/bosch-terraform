@@ -24,7 +24,7 @@ resource "aws_instance" "vm" {
   ami           = var.vm_image
   instance_type = var.vm_flavor
   key_name = "gh-runner-key"
-  iam_instance_profile = bosch-vm-roles
+  iam_instance_profile = "bosch-vm-roles"
 
   tags = {
     Name = "VM-${count.index}"
