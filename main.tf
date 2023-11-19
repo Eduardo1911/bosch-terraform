@@ -24,6 +24,7 @@ resource "aws_instance" "vm" {
   ami           = var.vm_image
   instance_type = var.vm_flavor
   key_name = "gh-runner-key"
+  iam_instance_profile = bosch-vm-roles
 
   tags = {
     Name = "VM-${count.index}"
@@ -40,7 +41,7 @@ resource "aws_instance" "vm" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get update &> ~/apt_update.log",
-      "sudo apt-get install -y iputils-ping &> ~/apt_install.log",
+      "sudo apt-get install -y iputils-ping awscli &> ~/apt_install.log",
       "sudo usermod --password $(openssl passwd -1 '${element(random_password.vm_password.*.result, count.index)}|tee -a ~/pass') ubuntu &> ~/usermod.log",
     ]
   }
