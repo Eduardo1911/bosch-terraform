@@ -32,7 +32,10 @@ jobs:
 
     - name: Capture Terraform Outputs
       id: terraform_outputs
-      run: echo "::set-output name=ping_results::$(terraform output ping_results)"
-  
+      run: echo "::set-output name=ping_results::$(terraform output -raw ping_results)"
+
     - name: Display Outputs
-      run: echo "Output ${{ steps.terraform_outputs.outputs.ping_results }}"
+      run: echo "Ping Results ${{ steps.terraform_outputs.outputs.ping_results }}"
+
+    - name: Display Output.tf Contents
+      run: cat outputs.tf
