@@ -35,4 +35,4 @@ jobs:
       run: echo "::set-output name=ping_results::$(terraform output ping_results)"
   
     - name: Display Outputs
-      run: echo "Example Output ${{ steps.terraform_outputs.outputs.ping_results }}"
+      run: echo "Output ${{ steps.terraform_outputs.outputs.ping_results }}"
