@@ -37,5 +37,5 @@ jobs:
     - name: Display Outputs
       run: echo "Ping Results ${{ steps.terraform_outputs.outputs.ping_results }}"
 
-    - name: Display Output.tf Contents
-      run: cat outputs.tf
+    - name: Display files on gh runner
+      run: ls -R 
