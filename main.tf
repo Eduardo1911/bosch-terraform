@@ -87,6 +87,7 @@ resource "null_resource" "run_ping_tests" {
     inline = [
       "chmod +x /tmp/ping_test.sh",  # Ensure the script is executable
       "/tmp/ping_test.sh ${var.vm_count} ${join(" ", aws_instance.vm[*].private_ip)} > /tmp/ping_results.txt",
+      "cat /tmp/ping_results.txt"
     ]
 
     connection {
@@ -102,5 +103,6 @@ resource "null_resource" "run_ping_tests" {
 
 output "ping_results" {
   value = join("\n", [for idx in range(var.vm_count) : fileexists("/tmp/ping_results.txt") ? file("/tmp/ping_results.txt") : ""])
+  depends_on = [null_resource.run_ping_tests]
 }
 
