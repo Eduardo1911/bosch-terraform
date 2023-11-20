@@ -29,3 +29,10 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Capture Terraform Outputs
+      id: terraform_outputs
+      run: echo "::set-output name=ping_results::$(terraform output ping_results)"
+  
+    - name: Display Outputs
+      run: echo "Example Output ${{ steps.terraform_outputs.outputs.ping_results }}"

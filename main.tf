@@ -7,18 +7,6 @@ provider "aws" {
   region = "eu-central-1"  # Change this to your desired region
 }
 
-# resource "null_resource" "store_public_ips" {
-#   count = var.vm_count
-
-#   triggers = {
-#     public_ip = aws_instance.vm[count.index].public_ip
-#   }
-
-#   provisioner "local-exec" {
-#     command = "echo 'export VM_PUBLIC_IP_${count.index}=${aws_instance.vm[count.index].public_ip}' >> terraform.tfvars"
-#   }
-# }
-
 resource "aws_instance" "vm" {
   count         = var.vm_count
   ami           = var.vm_image
@@ -29,7 +17,7 @@ resource "aws_instance" "vm" {
   tags = {
     Name = "VM-${count.index}"
   }
-  
+
   user_data = <<-EOF
             #!/bin/bash
             echo "VM-${count.index}" | sudo tee /etc/hostname
@@ -47,7 +35,7 @@ resource "aws_instance" "vm" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get update &> ~/apt_update.log",
-      "sudo apt-get install -y iputils-ping awscli &> ~/apt_install.log",
+      "sudo apt-get install -y iputils-ping &> ~/apt_install.log",
       "sudo usermod --password $(openssl passwd -1 '${element(random_password.vm_password.*.result, count.index)}|tee -a ~/pass') ubuntu &> ~/usermod.log",
     ]
   }
@@ -77,21 +65,6 @@ resource "aws_security_group" "vm_sg" {
   }
 }
 
-
-# resource "null_resource" "run_ping_tests" {
-#   count = var.vm_count
-
-#   triggers = {
-#     vm_index = count.index
-#   }
-
-#   provisioner "local-exec" {
-#     command = "bash ping_test.sh ${var.vm_count} ${join(" ", aws_instance.vm[*].id)}"
-#   }
-
-#   depends_on = [aws_instance.vm]  # Ensure the instances are created before running the script
-# }
-
 resource "null_resource" "run_ping_tests" {
   count = var.vm_count
 
@@ -112,8 +85,6 @@ resource "null_resource" "run_ping_tests" {
   }
   provisioner "remote-exec" {
     inline = [
-      "sudo apt update",
-      "sudo apt install -y awscli",
       "chmod +x /tmp/ping_test.sh",  # Ensure the script is executable
       "/tmp/ping_test.sh ${var.vm_count} ${join(" ", aws_instance.vm[*].private_ip)} > /tmp/ping_results.txt",
     ]

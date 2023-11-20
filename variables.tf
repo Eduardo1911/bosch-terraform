@@ -16,11 +16,6 @@ variable "vm_image" {
   default     = "ami-0bf34e885a84149e6"  # Change this to your desired AMI
 }
 
-# variable "VM_PUBLIC_IPS" {
-#   type    = list(string)
-#   default = []
-# }
-
 variable "password_length" {
   description = "The length of the randomly generated passwords"
   type        = number
